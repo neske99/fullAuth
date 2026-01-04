@@ -1,7 +1,17 @@
 import express, { type NextFunction, type Request, type Response } from 'express'
 import {verifyToken} from '../services/auth.service.ts'
 
-export default async function(req:Request,res:Response,next:NextFunction){
+export function authorizeRoles(...roles:string[]){
+
+    return function(req:Request,res:Response,next:NextFunction){
+        if(roles.includes(req.user)){
+            next()
+        }
+    }
+
+}
+
+export default function(req:Request,res:Response,next:NextFunction){
     const header=req.headers.authorization;
     if(header ==undefined){
         console.log(header);

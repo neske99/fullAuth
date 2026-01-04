@@ -1,0 +1,10 @@
+
+services:
+  app.api:
+    image: myapp
+    build:
+      context: .
+      dockerfile: Dockerfile
+
+  mongodb:
+    image: mongo:latest
