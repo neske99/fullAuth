@@ -3,20 +3,28 @@ import jsonwebtoken from 'jsonwebtoken'
 
 
 function sign(user:string){
-    const secretkey=process.env.SECRET_ACCESS_KEY;
-    if(secretkey==undefined)
+    const secretKey=process.env.SECRET_ACCESS_KEY;
+    if(secretKey==undefined)
         throw new Error("SECRET_ACCESS_KEY is undefined")
 
-    return jsonwebtoken.sign(user, secretkey)
+    return jsonwebtoken.sign(user, secretKey)
 }
 
-function validate(token:string){
-    const secretkey=process.env.SECRET_ACCESS_KEY;
-    if(secretkey==undefined)
+function verifyToken(token:string){
+    const secretKey=process.env.SECRET_ACCESS_KEY;
+    if(secretKey==undefined)
         throw new Error("SECRET_ACCESS_KEY is undefined")
 
-    return jsonwebtoken.verify(token,secretkey);
+      try{
+        const decoded=jsonwebtoken.verify(token,secretKey);
+        return decoded;
+      }catch(err){
+        return undefined;
+      }
 }
 
 
-export {sign,validate}
+
+
+
+export {sign,verifyToken}

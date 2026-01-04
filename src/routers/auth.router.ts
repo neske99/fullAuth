@@ -1,5 +1,5 @@
 import express from 'express'
-import authmiddleware from '../middlewares/authmiddleware.ts';
+import authMiddleware from '../middlewares/auth.middleware.ts';
 import { sign } from '../services/auth.service.ts';
 
 const router=express.Router();
@@ -21,7 +21,7 @@ router.get('/sign',(req,res,next)=>{
   res.send(sign("12345"));
 });
 
-router.get('/validateToken',authmiddleware,(req,res,next)=>{
+router.get('/validateToken',authMiddleware,(req,res,next)=>{
   res.sendStatus(200);
 });
 
