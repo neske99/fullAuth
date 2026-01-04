@@ -5,6 +5,7 @@ import { sign } from '../services/auth.service.ts';
 const router=express.Router();
 
 router.get('/login',(req,res,next)=>{
+  throw new Error("Dzoni Test error")
   res.send("This is a call to login")
 });
 router.get('/logout',(req,res,next)=>{
