@@ -4,11 +4,10 @@ import {verifyToken} from '../services/auth.service.ts'
 export function authorizeRoles(...roles:string[]){
 
     return function(req:Request,res:Response,next:NextFunction){
-        if(roles.includes(req.user)){
+        if(roles.includes(req.body.user)){
             next()
         }
     }
-
 }
 
 export default function(req:Request,res:Response,next:NextFunction){
@@ -34,7 +33,8 @@ export default function(req:Request,res:Response,next:NextFunction){
             res.sendStatus(403)
             return;
         }
-        req.user=user;
+        req.body.user=user;
+        console.log(user);
 
     }else{
         res.sendStatus(401);
