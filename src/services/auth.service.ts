@@ -1,16 +1,18 @@
 import jsonwebtoken from 'jsonwebtoken'
 import mongoose from 'mongoose';
 import { userModel,type User} from '../models/user.model.ts'
+import type { StringValue } from 'ms';
 
 
 
 function sign(user: User ){
     const secretKey=process.env.SECRET_ACCESS_KEY;
-    if(secretKey==undefined)
+    let expiresIn=process.env.ACCESS_TOKEN_EXPIRESIN;
+    if(secretKey==undefined || expiresIn==undefined)
         throw new Error("SECRET_ACCESS_KEY is undefined")
     let userDTO={username:user.username,roles:user.roles};
 
-    return jsonwebtoken.sign(userDTO, secretKey,{expiresIn:'15m'})
+    return jsonwebtoken.sign(userDTO, secretKey,{expiresIn:expiresIn as StringValue})
 }
 
 function verifyToken(token:string){
