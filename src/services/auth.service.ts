@@ -74,7 +74,7 @@ async function refreshToken(refreshToken:string){
     const newAccessToken=generateAccessToken(user);
     const newRefreshToken=generateRefreshToken(user);
 
-    refreshTokenModel.create({refreshToken:newRefreshToken})
+    refreshTokenModel.create({refreshToken:newRefreshToken,})
 
     let result={accessToken:newAccessToken,refreshToken:newRefreshToken};
     return result;
