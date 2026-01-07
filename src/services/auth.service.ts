@@ -4,6 +4,7 @@ import { userModel,type User} from '../models/user.model.ts'
 import type { StringValue } from 'ms';
 import {type RefreshToken,refreshTokenModel} from '../models/refreshToken.model.ts'
 import bcrypt from 'bcrypt'
+import crypto from 'crypto'
 
 
 
@@ -48,7 +49,9 @@ async function login(username:string,password:string){
   }
   const accessToken=generateAccessToken(user);
   const refreshToken=generateRefreshToken(user);
-  refreshTokenModel.create({refreshToken:refreshToken,})
+
+  const refreshTokenHash=crypto.createHash('sha256').update(refreshToken).digest('hex');
+  refreshTokenModel.create({refreshToken:refreshTokenHash})
 
   return {accessToken:accessToken,refreshToken:refreshToken};
 }
@@ -77,7 +80,10 @@ async function refreshToken(refreshToken:string){
     const newAccessToken=generateAccessToken(user);
     const newRefreshToken=generateRefreshToken(user);
 
-    refreshTokenModel.create({refreshToken:newRefreshToken,})
+    const refreshTokenHash=crypto.createHash('sha256').update(newRefreshToken).digest('hex');
+
+
+    refreshTokenModel.create({refreshToken:refreshTokenHash})
 
     let result={accessToken:newAccessToken,refreshToken:newRefreshToken};
     return result;
@@ -87,7 +93,9 @@ async function refreshToken(refreshToken:string){
 }
 
 async function logout(refreshToken:string){
-  let result=await refreshTokenModel.deleteOne({refreshToken:refreshToken}).exec();
+
+  const refreshTokenHash=crypto.createHash('sha256').update(refreshToken).digest('hex');
+  let result=await refreshTokenModel.deleteOne({refreshToken:refreshTokenHash}).exec();
   if( result.acknowledged && result.deletedCount>0)
     return true;
   return false;
