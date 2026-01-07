@@ -3,6 +3,7 @@ import mongoose from 'mongoose';
 import { userModel,type User} from '../models/user.model.ts'
 import type { StringValue } from 'ms';
 import {type RefreshToken,refreshTokenModel} from '../models/refreshToken.model.ts'
+import bcrypt from 'bcrypt'
 
 
 
@@ -42,7 +43,7 @@ function verifyToken(token:string){
 async function login(username:string,password:string){
 
   const user=await userModel.findOne({username}).exec();
-  if(user ==undefined || user.password!=password){
+  if(user ==undefined || !(await bcrypt.compare(password,user.password))){
     return undefined;
   }
   const accessToken=generateAccessToken(user);
@@ -53,7 +54,9 @@ async function login(username:string,password:string){
 }
 
 async function registerBasicUser(username:string,password:string){
-  return (await userModel.create({username,password,roles:["BasicUser"]})) as User;
+  const salt=await bcrypt.genSalt(10);
+  const hashedPassword=await bcrypt.hash(password,salt);
+  return (await userModel.create({username,password:hashedPassword,roles:["BasicUser"]})) as User;
 }
 
 async function refreshToken(refreshToken:string){
