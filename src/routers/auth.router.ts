@@ -23,7 +23,7 @@ router.post('/login',async (req,res,next)=>{
   let username:string=req.body.username;
   let password:string=req.body.password;
   let refreshAndAccessTokens=await login(username,password)
-  console.log(refreshAndAccessTokens);
+  //console.log(refreshAndAccessTokens);
   if(refreshAndAccessTokens==undefined)
     res.send("Login failed for credentials");
   else
@@ -45,7 +45,8 @@ router.get('/logout',async (req,res,next)=>{
 
 
 router.get('/validateToken',authMiddleware,(req,res,next)=>{
-  console.log(req.body);
+  throw new Error("Neske test");
+  //console.log(req.body);
   res.send(req.body.user);
 });
 
