@@ -1,6 +1,7 @@
 import express from 'express'
 import dotenv from 'dotenv'
-import autRouter from './routers/auth.router.ts'
+import authRouter from './routers/auth.router.ts'
+import userRouter from './routers/user.router.ts'
 import errorHandlingMiddleware from './middlewares/errorHandling.middleware.ts';
 import mongoose from 'mongoose';
 dotenv.config()
@@ -15,7 +16,8 @@ const app=express();
 app.use(express.json())
 
 
-app.use('/auth',autRouter);
+app.use('/auth',authRouter);
+app.use('/user',userRouter)
 
 app.get("/",(req,res,next)=>{
 

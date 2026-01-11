@@ -1,9 +1,10 @@
 import express from 'express'
-import authMiddleware from '../middlewares/auth.middleware.ts';
-import { login,registerBasicUser,refreshToken, logout} from '../services/auth.service.ts';
-import type { CreateUserDTO } from '../dtos/createUser.dto.ts';
-import { CreateUserDTOSchema } from '../dtos/createUser.dto.ts';
-import { UserTokenDTOSchema } from '../dtos/userToken.dto.ts';
+import authMiddleware, { authorizeRoles } from '../middlewares/auth.middleware.ts';
+import { login,refreshToken, logout, registerAdmin, registerTenantUser, registerTenantAdmin} from '../services/auth.service.ts';
+import type { CreateUserDTO } from '../dtos/user/createUser.dto.ts';
+import { CreateUserDTOSchema } from '../dtos/user/createUser.dto.ts';
+import { UserTokenDTOSchema } from '../dtos/user/userToken.dto.ts';
+import { Role } from '../constants/roles.ts';
 
 const router=express.Router();
 
@@ -14,7 +15,28 @@ const router=express.Router();
 router.post('/signup',async (req,res,next)=>{
   let userDTO:CreateUserDTO=CreateUserDTOSchema.parse(req.body);
   try{
-    let user=await registerBasicUser(userDTO.username,userDTO.password);
+    let user=await registerAdmin(userDTO.username,userDTO.password);
+    res.send(user);
+  }catch(err){
+    res.send("User already exists")
+  }
+});
+
+
+router.post('/createTenantAdmin',authMiddleware,authorizeRoles(Role.Admin),async (req,res,next)=>{
+  let userDTO:CreateUserDTO=CreateUserDTOSchema.parse(req.body);
+  try{
+    let user=await registerTenantAdmin(userDTO.username,userDTO.password);
+    res.send(user);
+  }catch(err){
+    res.send("User already exists")
+  }
+});
+
+router.post('/createTenantUser',authMiddleware,authorizeRoles(Role.Admin,Role.TenantAdmin),async (req,res,next)=>{
+  let userDTO:CreateUserDTO=CreateUserDTOSchema.parse(req.body);
+  try{
+    let user=await registerTenantUser(userDTO.username,userDTO.password);
     res.send(user);
   }catch(err){
     res.send("User already exists")
@@ -40,6 +62,11 @@ router.post('/refresh',async (req,res,next)=>{
 });
 
 router.get('/logout',async (req,res,next)=>{
+  const success=await logout(req.body.refreshToken);
+  res.send(success);
+});
+
+router.get('/admin',async (req,res,next)=>{
   const success=await logout(req.body.refreshToken);
   res.send(success);
 });

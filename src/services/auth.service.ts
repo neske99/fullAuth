@@ -5,6 +5,7 @@ import type { StringValue } from 'ms';
 import {type RefreshToken,refreshTokenModel} from '../models/refreshToken.model.ts'
 import bcrypt from 'bcrypt'
 import crypto from 'crypto'
+import {Role} from '../constants/roles.ts'
 
 
 
@@ -56,10 +57,22 @@ async function login(username:string,password:string){
   return {accessToken:accessToken,refreshToken:refreshToken};
 }
 
-async function registerBasicUser(username:string,password:string){
+async function registerTenantUser(username:string,password:string){
   const salt=await bcrypt.genSalt(10);
   const hashedPassword=await bcrypt.hash(password,salt);
-  return (await userModel.create({username,password:hashedPassword,roles:["BasicUser"]})) as User;
+  return (await userModel.create({username,password:hashedPassword,roles:[Role.TenantUser]})) as User;
+}
+
+async function registerTenantAdmin(username:string,password:string){
+  const salt=await bcrypt.genSalt(10);
+  const hashedPassword=await bcrypt.hash(password,salt);
+  return (await userModel.create({username,password:hashedPassword,roles:[Role.TenantAdmin]})) as User;
+}
+
+async function registerAdmin(username:string,password:string){
+  const salt=await bcrypt.genSalt(10);
+  const hashedPassword=await bcrypt.hash(password,salt);
+  return (await userModel.create({username,password:hashedPassword,roles:[Role.Admin]})) as User;
 }
 
 async function refreshToken(refreshToken:string){
@@ -105,4 +118,12 @@ async function logout(refreshToken:string){
 
 
 
-export {registerBasicUser,verifyToken,login,refreshToken,logout}
+export {
+  registerAdmin,
+  registerTenantUser,
+  registerTenantAdmin,
+  verifyToken,
+  login,
+  refreshToken,
+  logout
+}

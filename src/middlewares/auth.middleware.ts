@@ -1,12 +1,17 @@
 import express, { type NextFunction, type Request, type Response } from 'express'
 import {verifyToken} from '../services/auth.service.ts'
-import { UserTokenDTOSchema,type UserTokenDTO } from '../dtos/userToken.dto.ts'
+import { UserTokenDTOSchema,type UserTokenDTO } from '../dtos/user/userToken.dto.ts'
+import {type Role} from '../constants/roles.ts'
 
-export function authorizeRoles(...roles:string[]){
+export function authorizeRoles(...requiredRoles:Role[]){
 
     return function(req:Request,res:Response,next:NextFunction){
-        if(roles.includes(req.body.user)){
+
+        let roles:Role[]=req.body.user.roles;
+        if(requiredRoles.some(rr=>roles.includes(rr))){
             next()
+        }else{
+            res.sendStatus(403);
         }
     }
 }
