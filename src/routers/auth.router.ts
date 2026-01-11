@@ -1,6 +1,9 @@
 import express from 'express'
 import authMiddleware from '../middlewares/auth.middleware.ts';
 import { login,registerBasicUser,refreshToken, logout} from '../services/auth.service.ts';
+import type { CreateUserDTO } from '../dtos/createUser.dto.ts';
+import { CreateUserDTOSchema } from '../dtos/createUser.dto.ts';
+import { UserTokenDTOSchema } from '../dtos/userToken.dto.ts';
 
 const router=express.Router();
 
@@ -9,20 +12,18 @@ const router=express.Router();
 //   res.send("This is a call to login")
 // });
 router.post('/signup',async (req,res,next)=>{
-  let username:string=req.body.username;
-  let password:string=req.body.password;
+  let userDTO:CreateUserDTO=CreateUserDTOSchema.parse(req.body);
   try{
-    let user=await registerBasicUser(username,password);
-    res.send(user)
+    let user=await registerBasicUser(userDTO.username,userDTO.password);
+    res.send(user);
   }catch(err){
     res.send("User already exists")
   }
 });
 
 router.post('/login',async (req,res,next)=>{
-  let username:string=req.body.username;
-  let password:string=req.body.password;
-  let refreshAndAccessTokens=await login(username,password)
+  const userDTO:CreateUserDTO=CreateUserDTOSchema.parse( req.body);
+  let refreshAndAccessTokens=await login(userDTO.username,userDTO.password)
   //console.log(refreshAndAccessTokens);
   if(refreshAndAccessTokens==undefined)
     res.send("Login failed for credentials");

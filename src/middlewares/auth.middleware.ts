@@ -1,5 +1,6 @@
 import express, { type NextFunction, type Request, type Response } from 'express'
 import {verifyToken} from '../services/auth.service.ts'
+import { UserTokenDTOSchema,type UserTokenDTO } from '../dtos/userToken.dto.ts'
 
 export function authorizeRoles(...roles:string[]){
 
@@ -33,7 +34,7 @@ export default function(req:Request,res:Response,next:NextFunction){
             res.sendStatus(403)
             return;
         }
-        req.body.user=user;
+        req.body.user=UserTokenDTOSchema.parse(user);
         console.log(user);
 
     }else{
