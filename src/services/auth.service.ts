@@ -45,7 +45,7 @@ function verifyToken(token:string){
 async function login(username:string,password:string){
 
   const user=await userModel.findOne({username}).exec();
-  if(user ==undefined || !(await bcrypt.compare(password,user.password))){
+  if(user ==undefined || !user.isActive || !(await bcrypt.compare(password,user.password))){
     return undefined;
   }
   const accessToken=generateAccessToken(user);
@@ -60,19 +60,19 @@ async function login(username:string,password:string){
 async function registerTenantUser(username:string,password:string){
   const salt=await bcrypt.genSalt(10);
   const hashedPassword=await bcrypt.hash(password,salt);
-  return (await userModel.create({username,password:hashedPassword,roles:[Role.TenantUser]})) as User;
+  return (await userModel.create({username,password:hashedPassword,roles:[Role.TenantUser],isActive:true})) as User;
 }
 
 async function registerTenantAdmin(username:string,password:string){
   const salt=await bcrypt.genSalt(10);
   const hashedPassword=await bcrypt.hash(password,salt);
-  return (await userModel.create({username,password:hashedPassword,roles:[Role.TenantAdmin]})) as User;
+  return (await userModel.create({username,password:hashedPassword,roles:[Role.TenantAdmin],isActive:true})) as User;
 }
 
 async function registerAdmin(username:string,password:string){
   const salt=await bcrypt.genSalt(10);
   const hashedPassword=await bcrypt.hash(password,salt);
-  return (await userModel.create({username,password:hashedPassword,roles:[Role.Admin]})) as User;
+  return (await userModel.create({username,password:hashedPassword,roles:[Role.Admin],isActive:true})) as User;
 }
 
 async function refreshToken(refreshToken:string){

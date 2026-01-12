@@ -18,6 +18,15 @@ const setUserRoles=async function(username:string,roles:Role[]){
     console.log(result);
     return result.acknowledged && result.matchedCount>0;
   }
+}
+
+const setUserIsActive=async function(username:string,isActive:boolean){
+  const user:User | null= await userModel.findOne({username:username}).exec();
+  if(user==null){
+    return false;
   }
 
-export {setUserRoles}
+  let result=await userModel.updateOne({username:username},{isActive:isActive}).exec();
+  return result.acknowledged && result.matchedCount>0;
+}
+export {setUserRoles,setUserIsActive}
